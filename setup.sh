@@ -6,3 +6,4 @@ rm -rf api/routes/api.php
 mv api-temp/api.php api/routes/api.php
 mv api-temp/TestController.php api/app/Http/Controllers/TestController.php
 rm -rf api-temp/
+open http://localhost
