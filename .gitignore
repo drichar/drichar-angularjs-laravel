@@ -1,0 +1,15 @@
+.env
+.DS_Store
+*.log
+npm-debug.log
+.idea
+.vagrant
+
+api/node_modules
+api/public/hot
+api/public/storage
+api/storage/*.key
+api/vendor
+
+ui/node_modules
+ui/bower_components

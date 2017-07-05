@@ -1,0 +1,77 @@
+version: '2'
+services:
+
+  app:
+    build:
+      context: ./api
+      dockerfile: app.dockerfile
+    working_dir: /var/www
+    volumes:
+      - ./api:/var/www
+    environment:
+      - "DB_PORT=3306"
+      - "DB_HOST=database"
+
+  api:
+    image: nginx
+    depends_on:
+      - app
+    volumes:
+      - ./api:/usr/share/nginx/html
+      - ./docker/api.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 81:80
+
+  gulp:
+    build:
+      context: ./ui
+      dockerfile: ui.dockerfile
+    working_dir: /usr/share/nginx/html
+    volumes:
+      - ./ui:/usr/share/nginx/html
+    command: /usr/share/nginx/html/run.sh
+
+  ui:
+    image: nginx
+    depends_on:
+      - gulp
+    volumes:
+      - ./docker/ui.conf:/etc/nginx/conf.d/default.conf
+    volumes_from:
+      - gulp
+    ports:
+      - 80:80
+
+  database:
+    image: mysql:5.6
+    volumes:
+      - dbdata:/var/lib/mysql
+    environment:
+      - "MYSQL_DATABASE=homestead"
+      - "MYSQL_USER=homestead"
+      - "MYSQL_PASSWORD=secret"
+      - "MYSQL_ROOT_PASSWORD=secret"
+    ports:
+      - "33061:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - app
+      - database
+    environment:
+      PMA_ARBITRARY: 1
+      MYSQL_USER: homestead
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: root
+    restart: always
+    ports:
+      - 82:80
+    volumes:
+      - /sessions
+    links:
+      # for mysql container
+      - "database:database"
+
+volumes:
+  dbdata:
